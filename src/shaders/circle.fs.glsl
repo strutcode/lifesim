@@ -5,10 +5,12 @@ varying vec2 v_texcoord;
 uniform vec4 u_color;
 
 void main() {
-  if (distance(v_texcoord, vec2(0.5)) < 0.5) {
-    gl_FragColor = u_color;
+  float distance = distance(v_texcoord, vec2(0.5));
+
+  if (distance < 0.5) {
+    gl_FragColor = mix(u_color, vec4(0, 0, 0, 1), distance);
   }
   else {
-    gl_FragColor = vec4(0,0,0,1);
+    discard;
   }
 }
