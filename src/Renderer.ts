@@ -52,7 +52,6 @@ export default class Renderer {
 
   private initGfx() {
     const program = this.loadShader('circle')
-    console.log(program)
 
     if (!program) {
       throw `Couldn't load shader`
@@ -131,10 +130,7 @@ export default class Renderer {
     gl.useProgram(this.shader.program)
     setBuffersAndAttributes(gl, this.shader, bufferInfo)
 
-    let cell
-    for (let i = 0; i < this.simulation.cells.length; i++) {
-      cell = this.simulation.cells[i]
-
+    for (let cell of this.simulation.cells) {
       setUniforms(this.shader, {
         u_color: [1, 0, 0, 1],
         u_view: this.projection,
