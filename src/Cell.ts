@@ -1,4 +1,3 @@
 export default class Cell {
-  x = 0
-  y = 0
+  pos = [0, 0]
 }

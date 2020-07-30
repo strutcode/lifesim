@@ -51,7 +51,7 @@ export default class Renderer {
   }
 
   private initGfx() {
-    const program = this.createShader('circle')
+    const program = this.loadShader('circle')
     console.log(program)
 
     if (!program) {
@@ -93,7 +93,7 @@ export default class Renderer {
     return this.canvas.width / this.canvas.height
   }
 
-  createShader(name: string) {
+  loadShader(name: string) {
     try {
       const vs = require(`./shaders/${name}.vs.glsl`).default
       const fs = require(`./shaders/${name}.fs.glsl`).default
@@ -110,6 +110,9 @@ export default class Renderer {
     gl.clearColor(0, 0, 0, 1)
     gl.clear(gl.COLOR_BUFFER_BIT)
     gl.disable(gl.DEPTH_TEST)
+
+    gl.canvas.width = window.innerWidth
+    gl.canvas.height = window.innerHeight
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
     const { pan, zoom, aspect } = this
@@ -127,12 +130,16 @@ export default class Renderer {
 
     gl.useProgram(this.shader.program)
     setBuffersAndAttributes(gl, this.shader, bufferInfo)
-    setUniforms(this.shader, {
-      u_color: [1, 0, 0, 1],
-      u_view: this.projection,
-    })
 
+    let cell
     for (let i = 0; i < this.simulation.cells.length; i++) {
+      cell = this.simulation.cells[i]
+
+      setUniforms(this.shader, {
+        u_color: [1, 0, 0, 1],
+        u_view: this.projection,
+        u_pos: cell.pos,
+      })
       drawBufferInfo(gl, bufferInfo)
     }
   }
