@@ -88,11 +88,7 @@ export default class Renderer {
     })
   }
 
-  get aspect() {
-    return this.canvas.width / this.canvas.height
-  }
-
-  loadShader(name: string) {
+  private loadShader(name: string) {
     try {
       const vs = require(`./shaders/${name}.vs.glsl`).default
       const fs = require(`./shaders/${name}.fs.glsl`).default
@@ -103,12 +99,23 @@ export default class Renderer {
     }
   }
 
-  draw() {
+  public get aspect() {
+    return this.canvas.width / this.canvas.height
+  }
+
+  public draw() {
     const gl = this.context
 
     gl.clearColor(0, 0, 0, 1)
     gl.clear(gl.COLOR_BUFFER_BIT)
     gl.disable(gl.DEPTH_TEST)
+    gl.enable(gl.BLEND)
+    gl.blendFuncSeparate(
+      gl.SRC_ALPHA,
+      gl.ONE_MINUS_SRC_ALPHA,
+      gl.ONE,
+      gl.ONE_MINUS_SRC_ALPHA,
+    )
 
     gl.canvas.width = window.innerWidth
     gl.canvas.height = window.innerHeight
@@ -134,7 +141,8 @@ export default class Renderer {
       setUniforms(this.shader, {
         u_color: [1, 0, 0, 1],
         u_view: this.projection,
-        u_pos: cell.pos,
+        u_pos: cell.position,
+        u_size: cell.size,
       })
       drawBufferInfo(gl, bufferInfo)
     }

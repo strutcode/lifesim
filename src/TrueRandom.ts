@@ -4,7 +4,7 @@ export default class TrueRandom {
   private static responseTime = 1
   private static rate = 0
 
-  static async init() {
+  public static async init() {
     this.refillBuffer()
     setInterval(() => {
       if (this.bufferPointer <= this.rate) {
@@ -78,7 +78,7 @@ export default class TrueRandom {
     })
   }
 
-  static float() {
+  public static float() {
     this.rate++
 
     // Fall back to psuedo random for buffer underflow
@@ -87,7 +87,7 @@ export default class TrueRandom {
     return this.buffer[this.bufferPointer--] / 1e10
   }
 
-  static int() {
+  public static int() {
     this.rate++
 
     // Fall back to psuedo random for buffer underflow
