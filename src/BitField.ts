@@ -1,12 +1,12 @@
 export default class BitField {
   private value: Uint8Array
 
-  public constructor(private size: number) {
-    this.value = new Uint8Array(Math.ceil(size / 8))
+  public constructor(private length: number) {
+    this.value = new Uint8Array(Math.ceil(length / 8))
   }
 
-  public get length() {
-    return this.size
+  public get size() {
+    return this.length
   }
 
   public get(bit: number) {
@@ -18,6 +18,10 @@ export default class BitField {
 
   public getByte(byte: number) {
     return this.value[byte]
+  }
+
+  public getBytes() {
+    return [...this.value]
   }
 
   public set(bit: number, value: boolean | 0 | 1) {
