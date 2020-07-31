@@ -35,7 +35,7 @@ export default class Cell {
       size: this.size,
     })
 
-    this.pos[0] += this.brain.output(0) * speed + this.brain.output(1) * speed
-    this.pos[1] += this.brain.output(2) * speed + this.brain.output(3) * speed
+    this.pos[0] += this.brain.output(0) * speed - this.brain.output(1) * speed
+    this.pos[1] += this.brain.output(2) * speed - this.brain.output(3) * speed
   }
 }
