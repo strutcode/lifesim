@@ -16,11 +16,19 @@ export default class BitField {
     return this.value[byte] & (1 << bitN) ? 1 : 0
   }
 
+  public getByte(byte: number) {
+    return this.value[byte]
+  }
+
   public set(bit: number, value: boolean | 0 | 1) {
     const byte = Math.floor(bit / 8)
     const bitN = bit % 8
 
-    this.value[byte] = this.value[byte] & ~(+value << bitN)
+    if (value) {
+      this.value[byte] |= 1 << bitN
+    } else {
+      this.value[byte] &= ~(1 << bitN)
+    }
   }
 
   public setByte(byte: number, value: number) {
