@@ -31,8 +31,8 @@ export default class Brain<T extends BrainInput> {
     this.decomposeInput(inputValues, this.inState)
 
     for (let n = 0; n < this.inState.length; n++) {
-      for (let o = 0; o < this.inState.length; o++) {
-        if (Math.random() >= this.neurons[n][o]) {
+      for (let o = 0; o < this.outState.length; o++) {
+        if (Math.random() <= this.neurons[n][o]) {
           this.outState.set(o, 1)
         }
       }
