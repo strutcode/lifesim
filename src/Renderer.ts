@@ -56,8 +56,8 @@ export default class Renderer {
 
     Object.assign(stats.style, {
       position: 'fixed',
-      top: 0,
-      left: 0,
+      top: '1em',
+      left: '1em',
       color: '#fff',
     })
 
