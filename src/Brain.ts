@@ -34,7 +34,7 @@ export default class Brain<T extends BrainInput> {
         if (this.inState.get(n) && this.outState.get(o)) {
           this.neurons[n][o] = clamp(0, this.neurons[n][o] + delta, 1)
         } else {
-          this.neurons[n][o] = clamp(0, this.neurons[n][o] - delta, 1)
+          this.neurons[n][o] = clamp(0, this.neurons[n][o] - 1e-5, 1)
         }
       }
     }
