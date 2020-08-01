@@ -28,9 +28,11 @@ export default class Brain<T extends BrainInput> {
   }
 
   public update(inputValues: T, delta: number = 0) {
+    let n, o
+
     // Reinforcement learning
-    for (let n = 0; n < this.inState.size; n++) {
-      for (let o = 0; o < this.outState.size; o++) {
+    for (n = 0; n < this.inState.size; n++) {
+      for (o = 0; o < this.outState.size; o++) {
         if (this.inState.get(n) && this.outState.get(o)) {
           this.neurons[n][o] = clamp(0, this.neurons[n][o] + delta, 1)
         } else {
@@ -44,8 +46,8 @@ export default class Brain<T extends BrainInput> {
     this.decomposeInput(inputValues, this.inState)
 
     // Fire neurons
-    for (let n = 0; n < this.inState.size; n++) {
-      for (let o = 0; o < this.outState.size; o++) {
+    for (n = 0; n < this.inState.size; n++) {
+      for (o = 0; o < this.outState.size; o++) {
         // Random misfire
         if (Math.random() <= 1e-3) {
           this.outState.set(o, 1)
@@ -66,30 +68,32 @@ export default class Brain<T extends BrainInput> {
     return this.neurons.length
   }
 
+  private numberBuffer = new ArrayBuffer(8)
+  private floatView = new Float64Array(this.numberBuffer)
+  private byteView = new Uint8Array(this.numberBuffer)
   private decomposeInput(values: T, output: BitField) {
     const objectValues = Object.values(values)
-    const numberBuffer = new ArrayBuffer(8)
-    const floatView = new Float64Array(numberBuffer)
-    const byteView = new Uint8Array(numberBuffer)
 
-    let byte = 0
+    let i,
+      b,
+      byte = 0
     for (let value of objectValues) {
       if (typeof value === 'string') {
-        for (let i = 0; i < value.length; i++) {
+        for (i = 0; i < value.length; i++) {
           output.setByte(byte, value.charCodeAt(0))
           byte++
         }
       } else if (typeof value === 'number') {
-        floatView[0] = value
-        for (let b = 0; b < 8; b++) {
-          output.setByte(byte, byteView[b])
+        this.floatView[0] = value
+        for (b = 0; b < 8; b++) {
+          output.setByte(byte, this.byteView[b])
           byte++
         }
       } else {
-        for (let i = 0; i < value.length; i++) {
-          floatView[0] = value[i]
-          for (let b = 0; b < 8; b++) {
-            output.setByte(byte, byteView[b])
+        for (i = 0; i < value.length; i++) {
+          this.floatView[0] = value[i]
+          for (b = 0; b < 8; b++) {
+            output.setByte(byte, this.byteView[b])
             byte++
           }
         }

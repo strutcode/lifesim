@@ -6,6 +6,7 @@ import {
   setUniforms,
   setBuffersAndAttributes,
   m4,
+  BufferInfo,
 } from 'twgl.js'
 
 import Simulation from './Simulation'
@@ -14,6 +15,7 @@ export default class Renderer {
   canvas: HTMLCanvasElement = document.createElement('canvas')
   context!: WebGLRenderingContext
   shader!: ProgramInfo
+  bufferInfo!: BufferInfo
   projection = m4.identity()
   pan = {
     x: 0,
@@ -78,6 +80,8 @@ export default class Renderer {
     }
 
     this.shader = program
+
+    this.bufferInfo = primitives.createXYQuadBufferInfo(this.context)
   }
 
   private initInput() {
@@ -152,10 +156,8 @@ export default class Renderer {
       this.projection,
     )
 
-    const bufferInfo = primitives.createXYQuadBufferInfo(gl)
-
     gl.useProgram(this.shader.program)
-    setBuffersAndAttributes(gl, this.shader, bufferInfo)
+    setBuffersAndAttributes(gl, this.shader, this.bufferInfo)
 
     for (let cell of this.simulation.cells) {
       setUniforms(this.shader, {
@@ -164,7 +166,7 @@ export default class Renderer {
         u_pos: cell.position,
         u_size: cell.size,
       })
-      drawBufferInfo(gl, bufferInfo)
+      drawBufferInfo(gl, this.bufferInfo)
     }
   }
 }
