@@ -6,15 +6,13 @@ export default class Cell {
   public size = 1
   private speed = 0.1
   private pos = [Math.random() * 20 - 10, Math.random() * 20 - 10]
-  private brain = new Brain(
-    {
-      // food: Array(5),
-      // cells: Array(5),
-      nearestCell: 0,
-      // size: 0,
-    },
-    4,
-  )
+  private input = {
+    // food: Array(5),
+    // cells: Array(5),
+    nearestCell: 0,
+    // size: 0,
+  }
+  private brain = new Brain(this.input, 4)
   private gene = new Genome(this.brain.size)
 
   lastCellDist = Infinity
@@ -42,14 +40,10 @@ export default class Cell {
   public update(nearestCell: number) {
     const { speed } = this
 
-    // console.log('update', nearestCell)
+    this.input.nearestCell = nearestCell
+
     this.brain.update(
-      {
-        // food: [0, 0, 0, 0, 0],
-        // cells: [0, 0, 0, 0, 0],
-        nearestCell,
-        // size: this.size,
-      },
+      this.input,
       nearestCell < this.lastCellDist ? 1e-3 : -1e-3,
     )
 
