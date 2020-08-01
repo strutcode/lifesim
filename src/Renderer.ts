@@ -23,6 +23,7 @@ export default class Renderer {
 
   constructor(private simulation: Simulation) {
     this.initCanvas()
+    this.initUi()
     this.initGfx()
     this.initInput()
   }
@@ -48,6 +49,25 @@ export default class Renderer {
     this.canvas.height = window.innerHeight
 
     document.body.appendChild(this.canvas)
+  }
+
+  private initUi() {
+    const stats = document.createElement('div')
+
+    Object.assign(stats.style, {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      color: '#fff',
+    })
+
+    setInterval(() => {
+      stats.innerText = `Simulation efficiency: ${this.simulation.performance.toFixed(
+        2,
+      )}%`
+    }, 800)
+
+    document.body.appendChild(stats)
   }
 
   private initGfx() {

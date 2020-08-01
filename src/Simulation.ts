@@ -10,24 +10,26 @@ export default class Simulation {
   private boundUpdate = this.update.bind(this)
   private lastTime = performance.now()
   private accTime = 0
-  private rate = 10
+  private rate = 60
+  private efficiency = 0
 
   public constructor() {
     console.log('start simulation')
     // TrueRandom.int()
 
-    for (let i = 0; i < 10; i++) this.cells.push(new Cell())
+    for (let i = 0; i < 100; i++) this.cells.push(new Cell())
 
     window.requestAnimationFrame(this.boundUpdate)
   }
 
   public tick(delta: number) {
+    const start = performance.now()
     const tickTime = 1000 / this.rate
 
     this.accTime += delta
     if (this.accTime > 2000) {
       const lostFrames = Math.floor((this.accTime - 2000) / tickTime)
-      console.warn(`Skipping ${lostFrames} frames due to inactivity`)
+      console.warn(`Skipping ${lostFrames} frames because simulation is behind`)
     }
 
     while (this.accTime >= tickTime) {
@@ -48,6 +50,15 @@ export default class Simulation {
 
       this.accTime -= tickTime
     }
+
+    const end = performance.now()
+    const time = end - start
+
+    this.efficiency = (tickTime - time) / tickTime
+  }
+
+  public get performance() {
+    return this.efficiency * 100
   }
 
   public update() {
