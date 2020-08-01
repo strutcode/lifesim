@@ -12,18 +12,24 @@ import {
 import Simulation from './Simulation'
 
 export default class Renderer {
-  canvas: HTMLCanvasElement = document.createElement('canvas')
-  context!: WebGLRenderingContext
-  shader!: ProgramInfo
-  bufferInfo!: BufferInfo
-  projection = m4.identity()
-  pan = {
+  private canvas: HTMLCanvasElement = document.createElement('canvas')
+  private context!: WebGLRenderingContext
+  private shader!: ProgramInfo
+  private bufferInfo!: BufferInfo
+  private projection = m4.identity()
+  private pan = {
     x: 0,
     y: 0,
   }
-  zoom = 1
+  private zoom = 1
+  private uniforms = {
+    u_color: [1, 0, 0, 1],
+    u_view: this.projection,
+    u_pos: [0, 0],
+    u_size: 0,
+  }
 
-  constructor(private simulation: Simulation) {
+  public constructor(private simulation: Simulation) {
     this.initCanvas()
     this.initUi()
     this.initGfx()
@@ -80,8 +86,9 @@ export default class Renderer {
     }
 
     this.shader = program
-
     this.bufferInfo = primitives.createXYQuadBufferInfo(this.context)
+
+    this.updateProjection()
   }
 
   private initInput() {
@@ -92,6 +99,8 @@ export default class Renderer {
 
         this.pan.x -= ev.movementX * (1 / width) * 20 * aspect * zoom
         this.pan.y -= ev.movementY * (1 / height) * 20 * zoom
+
+        this.updateProjection()
       }
 
       const up = () => {
@@ -109,6 +118,8 @@ export default class Renderer {
       } else {
         this.zoom *= 0.8
       }
+
+      this.updateProjection()
     })
   }
 
@@ -121,6 +132,20 @@ export default class Renderer {
     } catch (e) {
       console.error(e)
     }
+  }
+
+  private updateProjection() {
+    const { pan, zoom, aspect } = this
+
+    m4.ortho(
+      -10 * zoom * aspect + pan.x,
+      10 * zoom * aspect + pan.x,
+      10 * zoom + pan.y,
+      -10 * zoom + pan.y,
+      0,
+      1,
+      this.projection,
+    )
   }
 
   public get aspect() {
@@ -145,27 +170,13 @@ export default class Renderer {
     gl.canvas.height = window.innerHeight
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
-    const { pan, zoom, aspect } = this
-    m4.ortho(
-      -10 * zoom * aspect + pan.x,
-      10 * zoom * aspect + pan.x,
-      10 * zoom + pan.y,
-      -10 * zoom + pan.y,
-      0,
-      1,
-      this.projection,
-    )
-
     gl.useProgram(this.shader.program)
     setBuffersAndAttributes(gl, this.shader, this.bufferInfo)
 
     for (let cell of this.simulation.cells) {
-      setUniforms(this.shader, {
-        u_color: [1, 0, 0, 1],
-        u_view: this.projection,
-        u_pos: cell.position,
-        u_size: cell.size,
-      })
+      this.uniforms.u_pos = cell.position
+      this.uniforms.u_size = cell.size
+      setUniforms(this.shader, this.uniforms)
       drawBufferInfo(gl, this.bufferInfo)
     }
   }
