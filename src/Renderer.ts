@@ -57,6 +57,10 @@ export default class Renderer {
     this.canvas.height = window.innerHeight
 
     document.body.appendChild(this.canvas)
+
+    window.addEventListener('resize', () => {
+      this.updateProjection()
+    })
   }
 
   private initUi() {
@@ -135,7 +139,10 @@ export default class Renderer {
   }
 
   private updateProjection() {
-    const { pan, zoom, aspect } = this
+    const { pan, zoom, aspect, canvas } = this
+
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
 
     m4.ortho(
       -10 * zoom * aspect + pan.x,
@@ -149,11 +156,13 @@ export default class Renderer {
   }
 
   public get aspect() {
-    return this.canvas.width / this.canvas.height
+    return window.innerWidth / window.innerHeight
   }
 
   public draw() {
     const gl = this.context
+
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
     gl.clearColor(0, 0, 0, 1)
     gl.clear(gl.COLOR_BUFFER_BIT)
@@ -165,10 +174,6 @@ export default class Renderer {
       gl.ONE,
       gl.ONE_MINUS_SRC_ALPHA,
     )
-
-    gl.canvas.width = window.innerWidth
-    gl.canvas.height = window.innerHeight
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height)
 
     gl.useProgram(this.shader.program)
     setBuffersAndAttributes(gl, this.shader, this.bufferInfo)
