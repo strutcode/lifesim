@@ -1,4 +1,8 @@
 {
+  "name": "lifesim",
+  "description": "An experiment in genetic algorithms",
+  "author": "Tristan Shelton",
+  "license": "MIT",
   "dependencies": {
     "@types/chai": "^4.2.12",
     "@types/html-webpack-plugin": "^3.2.3",
