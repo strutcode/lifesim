@@ -44,7 +44,7 @@ export default class Cell {
 
     this.brain.update(
       this.input,
-      nearestCell < this.lastCellDist ? 1e-3 : -1e-3,
+      nearestCell < this.lastCellDist ? 1e-3 : -1e-2,
     )
 
     this.pos[0] += this.brain.output(0) * speed - this.brain.output(1) * speed

@@ -4,7 +4,7 @@ import { clamp } from './Math'
 type BrainInput = Record<string, number | string | number[]>
 
 export default class Brain<T extends BrainInput> {
-  private neurons: number[][] = []
+  private neurons: number[][][] = []
   private inState: BitField
   private outState: BitField
 
@@ -19,8 +19,19 @@ export default class Brain<T extends BrainInput> {
       }
     })
 
-    for (let i = 0; i < this.neurons.length; i++) {
-      this.neurons[i] = Array(outputs).fill(0)
+    let i,
+      d = 0
+    for (i = 0; i < this.neurons.length; i++) {
+      d = Math.random()
+
+      this.neurons[i] = Array(outputs)
+        .fill(0)
+        .map(() => [
+          Math.random() * 0.25,
+          Math.random() * 0.25,
+          Math.random() * 0.25,
+          Math.random() * 0.25,
+        ])
     }
 
     this.inState = new BitField(this.neurons.length)
@@ -28,16 +39,18 @@ export default class Brain<T extends BrainInput> {
   }
 
   public update(inputValues: T, delta: number = 0) {
-    let n, o
+    let i, o, s
 
     // Reinforcement learning
-    for (n = 0; n < this.inState.size; n++) {
+    for (i = 0; i < this.inState.size; i++) {
       for (o = 0; o < this.outState.size; o++) {
-        if (this.inState.get(n) && this.outState.get(o)) {
-          this.neurons[n][o] = clamp(0, this.neurons[n][o] + delta, 1)
-        } else {
-          this.neurons[n][o] = clamp(0, this.neurons[n][o] - 1e-5, 1)
-        }
+        s = this.inState.get(i) + (this.outState.get(o) ? 2 : 3)
+
+        this.neurons[i][o][0] -= delta
+        this.neurons[i][o][1] -= delta
+        this.neurons[i][o][2] -= delta
+        this.neurons[i][o][3] -= delta
+        this.neurons[i][o][s] += delta * 2
       }
     }
 
@@ -46,14 +59,20 @@ export default class Brain<T extends BrainInput> {
     this.decomposeInput(inputValues, this.inState)
 
     // Fire neurons
-    for (n = 0; n < this.inState.size; n++) {
+    for (i = 0; i < this.inState.size; i++) {
       for (o = 0; o < this.outState.size; o++) {
-        // Random misfire
-        if (Math.random() <= 1e-3) {
-          this.outState.set(o, 1)
-        }
+        s = this.inState.get(i)
 
-        if (Math.random() <= this.neurons[n][o]) {
+        if (
+          Math.random() <= this.neurons[i][o][0] ||
+          Math.random() <= this.neurons[i][o][1]
+        ) {
+          this.outState.set(o, 0)
+        }
+        if (
+          Math.random() <= this.neurons[i][o][2] ||
+          Math.random() <= this.neurons[i][o][3]
+        ) {
           this.outState.set(o, 1)
         }
       }
